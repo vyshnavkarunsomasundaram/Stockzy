@@ -84,14 +84,27 @@ def get_indices_summary(index_names):
 @st.cache_data(ttl=300)  # Cache for 5 minutes = 300 seconds
 def get_top_nse_gainers_losers(top_k=5):
     """
-    Returns:
-        tuple: (top5_gainers, top5_losers)
-        Each is a list of dicts with fields like 'symbol', 'ltp', 'pChange', etc.
-    """
-    top_gainers = nse_get_top_gainers()
-    top_losers = nse_get_top_losers()
+    Safely fetches top NSE gainers and losers.
 
-    # Ensure only top 5 items (list already sorted best-first)
+    Returns:
+        tuple: (top_k_gainers, top_k_losers)
+    """
+    try:
+        top_gainers = nse_get_top_gainers()
+        if not isinstance(top_gainers, list):
+            top_gainers = []
+    except Exception as e:
+        print(f"Error fetching gainers: {e}")
+        top_gainers = []
+
+    try:
+        top_losers = nse_get_top_losers()
+        if not isinstance(top_losers, list):
+            top_losers = []
+    except Exception as e:
+        print(f"Error fetching losers: {e}")
+        top_losers = []
+
     return top_gainers[:top_k], top_losers[:top_k]
 
 @st.cache_data(ttl=300)
