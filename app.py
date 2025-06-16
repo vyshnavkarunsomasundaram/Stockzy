@@ -67,17 +67,29 @@ def get_indices_summary(index_names):
     return pd.DataFrame(summaries)
 
 
-@st.cache_data(ttl=300)  # Cache for 5 minutes = 300 seconds
+@st.cache_data(ttl=300)  # Cache for 5 minutes
 def get_top_nse_gainers_losers(top_k=5):
     """
     Returns:
-        tuple: (top5_gainers, top5_losers)
+        tuple: (top_k_gainers, top_k_losers)
         Each is a list of dicts with fields like 'symbol', 'ltp', 'pChange', etc.
     """
-    top_gainers = nse_get_top_gainers()
-    top_losers = nse_get_top_losers()
+    try:
+        top_gainers = nse_get_top_gainers()
+        if not isinstance(top_gainers, list):
+            top_gainers = []
+    except Exception as e:
+        st.warning(f"Error fetching top gainers: {e}")
+        top_gainers = []
 
-    # Ensure only top 5 items (list already sorted best-first)
+    try:
+        top_losers = nse_get_top_losers()
+        if not isinstance(top_losers, list):
+            top_losers = []
+    except Exception as e:
+        st.warning(f"Error fetching top losers: {e}")
+        top_losers = []
+
     return top_gainers[:top_k], top_losers[:top_k]
 
 
