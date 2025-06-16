@@ -37,8 +37,12 @@ period_options = {
 
 @st.cache_data(ttl=300)
 def get_nse_positions_data():
-    positions = nsefetch('https://www.nseindia.com/api/equity-stockIndices?index=SECURITIES%20IN%20F%26O')
-    df = pd.DataFrame(positions['data'])
+    try:
+        positions = nsefetch('https://www.nseindia.com/api/equity-stockIndices?index=SECURITIES%20IN%20F%26O')
+        df = pd.DataFrame(positions['data'])
+    except Exception as e:
+        print(f"Error fetching NSE positions: {e}")
+        df = pd.DataFrame()  # return empty DataFrame on failure
     return df
 
 st.session_state.nse_positions_data = get_nse_positions_data()
