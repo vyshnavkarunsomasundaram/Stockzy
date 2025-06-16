@@ -1,4 +1,4 @@
-# Main App
+# TODO: FIX NSE DATA FETCHING ISSUES - Blocked for ticker tape and top gainers and losrers
 import streamlit as st
 import yfinance as yf
 import plotly.graph_objs as go
