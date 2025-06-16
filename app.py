@@ -56,7 +56,7 @@ def get_nse_positions_data():
         df = pd.DataFrame(positions['data'])
         return df
     except Exception as e:
-        st.error(f"Failed to fetch NSE data: {str(e)}")
+        # st.error(f"Failed to fetch NSE data: {str(e)}")
         return pd.DataFrame()  # Return empty DataFrame on error
 
 st.session_state.nse_positions_data = get_nse_positions_data()
@@ -229,8 +229,9 @@ def get_nse_indices_data(top_k=20):
 
     return df_cleaned.reset_index(drop=True)
 
-
-TickerTape.ticker_tape_component(st.session_state.nse_positions_data)
+# Only render ticker tape if positions data has been fetched sucessfully
+if len(st.session_state.nse_positions_data)>0:
+    TickerTape.ticker_tape_component(st.session_state.nse_positions_data)
 
 # App title
 left, right = st.columns([6, 1])  # wider left column for title, narrower right for button
@@ -348,10 +349,10 @@ with st.sidebar:
 
 
         # TOP GAINERS AND LOSERS
-        st.subheader("📈 Top Gainers & Losers 📉")
         gainers, losers = get_top_nse_gainers_losers()
-        # Only render if gainers is non empty - otherwise get_top_gainers_losers() has failed
         if len(gainers)>0:
+            st.subheader("📈 Top Gainers & Losers 📉")
+            # Only render if gainers is non empty - otherwise get_top_gainers_losers() has failed
             # Select only the required columns
             columns_to_display = {
                 'symbol': 'Stock',
@@ -369,8 +370,8 @@ with st.sidebar:
             st.markdown("**🔽 Top 5 Losers**")
             st.dataframe(losers_display.set_index(losers_display.columns[0]))
 
-        else:
-            st.warning("Couldn't fetch gainers/losers at the moment.")
+        # else:
+        #     st.warning("Couldn't fetch gainers/losers at the moment.")
 
         # COMMODITIES SNAPSHOT - TODO: Not getting Indian Prices for now - so feature is revoked
         # st.subheader('🪙 Commodities Snapshot')
