@@ -79,7 +79,7 @@ def get_top_nse_gainers_losers(top_k=5):
         if not isinstance(top_gainers, list):
             top_gainers = []
     except Exception as e:
-        st.warning(f"Error fetching top gainers: {e}")
+        #st.warning(f"Error fetching top gainers: {e}")
         top_gainers = []
 
     try:
@@ -87,7 +87,7 @@ def get_top_nse_gainers_losers(top_k=5):
         if not isinstance(top_losers, list):
             top_losers = []
     except Exception as e:
-        st.warning(f"Error fetching top losers: {e}")
+        #st.warning(f"Error fetching top losers: {e}")
         top_losers = []
 
     return top_gainers[:top_k], top_losers[:top_k]
