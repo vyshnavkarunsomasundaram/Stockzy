@@ -11,7 +11,7 @@ from nsepython import nse_get_top_gainers, nse_get_top_losers, nse_get_index_quo
 from components import TickerTape
 
 # Page config
-st.set_page_config(page_title="Stock Easy", page_icon="📈", layout="wide")
+st.set_page_config(page_title="Stockzy", page_icon="📈", layout="wide")
 
 # Initialize session states
 if 'tracked_stocks' not in st.session_state:
@@ -36,28 +36,9 @@ period_options = {
 
 @st.cache_data(ttl=300)
 def get_nse_positions_data():
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Accept': 'application/json, text/plain, */*',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-    }
-
-    try:
-        response = requests.get(
-            'https://www.nseindia.com/api/equity-stockIndices?index=SECURITIES%20IN%20F%26O',
-            headers=headers,
-            timeout=10
-        )
-        response.raise_for_status()
-        positions = response.json()
-        df = pd.DataFrame(positions['data'])
-        return df
-    except Exception as e:
-        # st.error(f"Failed to fetch NSE data: {str(e)}")
-        return pd.DataFrame()  # Return empty DataFrame on error
+    positions = nsefetch('https://www.nseindia.com/api/equity-stockIndices?index=SECURITIES%20IN%20F%26O')
+    df = pd.DataFrame(positions['data'])
+    return df
 
 st.session_state.nse_positions_data = get_nse_positions_data()
 
@@ -84,28 +65,16 @@ def get_indices_summary(index_names):
 @st.cache_data(ttl=300)  # Cache for 5 minutes = 300 seconds
 def get_top_nse_gainers_losers(top_k=5):
     """
-    Safely fetches top NSE gainers and losers.
-
     Returns:
-        tuple: (top_k_gainers, top_k_losers)
+        tuple: (top5_gainers, top5_losers)
+        Each is a list of dicts with fields like 'symbol', 'ltp', 'pChange', etc.
     """
-    try:
-        top_gainers = nse_get_top_gainers()
-        if not isinstance(top_gainers, list):
-            top_gainers = []
-    except Exception as e:
-        print(f"Error fetching gainers: {e}")
-        top_gainers = []
+    top_gainers = nse_get_top_gainers()
+    top_losers = nse_get_top_losers()
 
-    try:
-        top_losers = nse_get_top_losers()
-        if not isinstance(top_losers, list):
-            top_losers = []
-    except Exception as e:
-        print(f"Error fetching losers: {e}")
-        top_losers = []
-
+    # Ensure only top 5 items (list already sorted best-first)
     return top_gainers[:top_k], top_losers[:top_k]
+
 
 @st.cache_data(ttl=300)
 def get_commodity_prices():
@@ -237,7 +206,7 @@ if len(st.session_state.nse_positions_data)>0:
 left, right = st.columns([6, 1])  # wider left column for title, narrower right for button
 
 with left:
-    st.title("StockEazy")
+    st.title("Stockzy")
 
 with right:
     # Inject custom CSS to vertically center content

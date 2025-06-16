@@ -44,7 +44,7 @@ def ticker_tape_component(df: pd.DataFrame):
 
         .ticker-content {{
             white-space: nowrap;
-            animation: scroll-left 1000s linear infinite;
+            animation: scroll-left 1200s linear infinite;
             font-family: 'Arial', sans-serif;
             font-size: 14px;
             font-weight: bold;
