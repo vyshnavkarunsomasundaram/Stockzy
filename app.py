@@ -33,11 +33,31 @@ period_options = {
     "3 Years": ("3y", "1wk")
 }
 
+
 @st.cache_data(ttl=300)
 def get_nse_positions_data():
-    positions = nsefetch('https://www.nseindia.com/api/equity-stockIndices?index=SECURITIES%20IN%20F%26O')
-    df = pd.DataFrame(positions['data'])
-    return df
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+    }
+
+    try:
+        response = requests.get(
+            'https://www.nseindia.com/api/equity-stockIndices?index=SECURITIES%20IN%20F%26O',
+            headers=headers,
+            timeout=10
+        )
+        response.raise_for_status()
+        positions = response.json()
+        df = pd.DataFrame(positions['data'])
+        return df
+    except Exception as e:
+        st.error(f"Failed to fetch NSE data: {str(e)}")
+        return pd.DataFrame()  # Return empty DataFrame on error
 
 st.session_state.nse_positions_data = get_nse_positions_data()
 
