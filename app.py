@@ -350,7 +350,8 @@ with st.sidebar:
         # TOP GAINERS AND LOSERS
         st.subheader("📈 Top Gainers & Losers 📉")
         gainers, losers = get_top_nse_gainers_losers()
-        if gainers is not None and losers is not None:
+        # Only render if gainers is non empty - otherwise get_top_gainers_losers() has failed
+        if len(gainers)>0:
             # Select only the required columns
             columns_to_display = {
                 'symbol': 'Stock',
